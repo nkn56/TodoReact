@@ -1,0 +1,104 @@
+// rfc Header react function base component import.
+import Header from "./MyComponents/Header";
+// rafc reacr arrow function based component import.
+import { Todos } from "./MyComponents/Todos";
+import { Footer } from "./MyComponents/Footer";
+// for delete todo
+import React, { useState, useEffect } from 'react';
+import { AddTodo } from "./MyComponents/AddTodo";
+import { About } from "./MyComponents/About";
+
+
+// import react router
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from "react-router-dom";
+
+
+function App() {
+
+  let initTodo;
+  if (localStorage.getItem("todos") === null) {
+    initTodo = [];
+  }
+  else {
+    initTodo = JSON.parse(localStorage.getItem("todos"));
+  }
+
+
+  const onDelete = (todo) => {
+    console.log("I am onDelete of todo", todo);
+    // deleting this way in react doesnt work
+    // let index = todos.indexOf(todo);
+    // todos.splice(index, 1);
+
+    setTodos(todos.filter((e) => {
+      return e !== todo;
+    }));
+
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }
+
+  const addTodo = (title, desc) => {
+    console.log("I am adding this todo", title, desc)
+
+    // if todos list is empty
+    let sno;
+    if (todos.length === 0) {
+      sno = 0;
+    }
+    else {
+      sno = todos[todos.length - 1].sno + 1;
+    }
+    const myTodo = {
+      sno: sno,
+      title: title,
+      desc: desc,
+    }
+
+    setTodos([...todos, myTodo]);
+    console.log(myTodo);
+
+  }
+
+  // setTodos function will update todos
+
+  const [todos, setTodos] = useState(initTodo);
+
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos])
+
+
+  return (
+    <>
+    <Router>
+      <Header title="MyTodosList" searchBar={false} />
+
+      <Switch>
+          <Route exact path="/" render={()=>{
+            return (
+            <>
+            <AddTodo addTodo={addTodo} />
+            <Todos todos={todos} onDelete={onDelete} />
+            </>
+            )
+          }}>
+          </Route>  
+          <Route exact path="/about">
+            <About />
+          </Route>
+        </Switch>
+
+
+      
+
+      <Footer />
+    </Router>  
+    </>
+  );
+}
+
+export default App;
